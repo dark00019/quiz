@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brew & You — Coffee Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F7F0E6;
+    --espresso: #2C1A0E;
+    --caramel: #C9853A;
+    --latte: #D4A96A;
+    --foam: #EFE4D2;
+    --mocha: #6B3F25;
+    --steam: #F2EAE0;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--cream);
+    color: var(--espresso);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 2rem;
+    position: relative;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, #e8d5b7 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 20% 100%, #d4a96a33 0%, transparent 60%),
+      var(--cream);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 10% 20%, #c9853a18 0 200px, transparent 200px),
+      radial-gradient(circle at 90% 80%, #6b3f2518 0 300px, transparent 300px);
+    pointer-events: none;
+  }
+
+  .bean-deco {
+    position: absolute;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+  .bean-1 { width: 220px; height: 120px; background: var(--espresso); top: 8%; left: -60px; transform: rotate(-30deg); }
+  .bean-2 { width: 160px; height: 85px; background: var(--mocha); bottom: 15%; right: -40px; transform: rotate(20deg); }
+  .bean-3 { width: 100px; height: 55px; background: var(--caramel); top: 60%; left: 5%; transform: rotate(60deg); }
+
+  .hero-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--caramel);
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 10vw, 6.5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--espresso);
+    margin-bottom: 0.5rem;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--caramel);
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    font-weight: 300;
+    color: var(--mocha);
+    max-width: 480px;
+    line-height: 1.7;
+    margin: 1.5rem auto 2.5rem;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    padding: 1rem 2.8rem;
+    background: var(--espresso);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .cta-btn:hover { background: var(--mocha); transform: translateY(-2px); }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--caramel);
+    animation: fadeUp 1s 0.8s ease both;
+  }
+  .scroll-hint::after {
+    content: '';
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--caramel), transparent);
+    animation: scrollLine 1.5s ease-in-out infinite;
+  }
+  @keyframes scrollLine { 0%,100%{opacity:0.3;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.2)} }
+
+  /* ── QUIZ SECTION ── */
+  .quiz-section {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 5rem 2rem 6rem;
+  }
+
+  .section-label {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--caramel);
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    text-align: center;
+    color: var(--espresso);
+    margin-bottom: 3rem;
+  }
+
+  /* Progress */
+  .progress-wrap { margin-bottom: 2.5rem; }
+  .progress-dots { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+  .dot {
+    width: 28px; height: 4px; border-radius: 2px;
+    background: var(--foam); border: 1px solid #d9c9b0;
+    transition: background 0.3s ease;
+  }
+  .dot.done { background: var(--latte); }
+  .dot.active { background: var(--caramel); }
+  .progress-text { text-align: center; font-size: 0.8rem; color: var(--mocha); font-weight: 300; }
+
+  /* Question card */
+  .q-card {
+    background: #fff;
+    border: 1px solid #e6d9c8;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 40px #c9853a12, 0 1px 0 #e6d9c8;
+    animation: slideIn 0.4s ease;
+  }
+
+  @keyframes slideIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  .q-number { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--caramel); margin-bottom: 0.75rem; }
+  .q-text { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--espresso); margin-bottom: 1.75rem; line-height: 1.35; }
+
+  .options { display: grid; gap: 10px; }
+
+  .opt {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    background: var(--steam);
+    border: 1.5px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--espresso);
+    transition: all 0.18s ease;
+    text-align: left;
+    width: 100%;
+  }
+  .opt:hover { background: var(--foam); border-color: var(--latte); }
+  .opt.selected { background: #fff8f0; border-color: var(--caramel); color: var(--mocha); font-weight: 500; }
+
+  .opt-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--foam);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+    transition: background 0.18s;
+  }
+  .opt.selected .opt-icon { background: #f0e0c8; }
+
+  /* Nav */
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+  .nav-back {
+    background: none; border: none; cursor: pointer;
+    font-size: 0.85rem; color: var(--mocha); font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 0; opacity: 0.7;
+  }
+  .nav-back:hover { opacity: 1; }
+  .nav-back:disabled { opacity: 0.2; cursor: not-allowed; }
+  .nav-next {
+    padding: 0.75rem 2.2rem;
+    background: var(--espresso); color: var(--cream);
+    border: none; border-radius: 100px; cursor: pointer;
+    font-size: 0.85rem; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.05em;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .nav-next:hover:not(:disabled) { background: var(--mocha); transform: translateX(3px); }
+  .nav-next:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+  /* ── RESULT ── */
+  .result-wrap { animation: slideIn 0.5s ease; }
+
+  .result-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .result-cup {
+    width: 100px; height: 100px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--latte), var(--caramel));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px; margin: 0 auto 1.5rem;
+    box-shadow: 0 8px 24px #c9853a30;
+  }
+  .result-type { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--caramel); margin-bottom: 0.5rem; }
+  .result-name { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--espresso); margin-bottom: 0.75rem; }
+  .result-desc { font-size: 1rem; font-weight: 300; color: var(--mocha); line-height: 1.75; max-width: 420px; margin: 0 auto; }
+
+  .answers-grid {
+    background: #fff;
+    border: 1px solid #e6d9c8;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    display: grid; gap: 0;
+  }
+  .ans-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--foam);
+    gap: 16px;
+    font-size: 0.9rem;
+  }
+  .ans-row:last-child { border-bottom: none; }
+  .ans-q { color: var(--mocha); font-weight: 300; flex-shrink: 0; max-width: 55%; }
+  .ans-a { color: var(--espresso); font-weight: 500; text-align: right; }
+
+  .result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-retake {
+    padding: 0.85rem 2rem; background: var(--espresso); color: var(--cream);
+    border: none; border-radius: 100px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 500;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-retake:hover { background: var(--mocha); transform: translateY(-2px); }
+  .btn-share {
+    padding: 0.85rem 2rem; background: transparent; color: var(--espresso);
+    border: 1.5px solid #d9c9b0; border-radius: 100px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-share:hover { border-color: var(--caramel); background: var(--steam); }
+
+  /* ── ABOUT SECTION ── */
+  .about-section {
+    background: var(--espresso);
+    color: var(--cream);
+    padding: 6rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .about-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 30% 50%, #c9853a18 0, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 80% 50%, #d4a96a12 0, transparent 70%);
+    pointer-events: none;
+  }
+  .about-inner { max-width: 580px; margin: 0 auto; position: relative; }
+  .about-eyebrow { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--latte); margin-bottom: 1rem; }
+  .about-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 1.5rem; line-height: 1.15; }
+  .about-title em { font-style: italic; color: var(--caramel); }
+  .about-text { font-weight: 300; font-size: 1rem; line-height: 1.8; color: #d4b896; }
+
+  .facts-row { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-top: 3.5rem; }
+  .fact { text-align: center; }
+  .fact-num { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--caramel); display: block; }
+  .fact-label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: #a08060; margin-top: 4px; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #1a0e07;
+    color: #7a5c44;
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+  footer span { color: var(--caramel); }
+
+  /* ── UTILS ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  @media(max-width: 520px) {
+    .q-card { padding: 1.75rem 1.25rem; }
+    .hero-title { font-size: 2.8rem; }
+    .facts-row { gap: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="bean-deco bean-1"></div>
+  <div class="bean-deco bean-2"></div>
+  <div class="bean-deco bean-3"></div>
+  <p class="hero-eyebrow">Brew &amp; You</p>
+  <h1 class="hero-title">What's your<br><em>coffee soul?</em></h1>
+  <p class="hero-sub">A few quick questions to reveal your perfect cup — and what it says about you.</p>
+  <a href="#quiz" class="cta-btn">Start the quiz</a>
+  <div class="scroll-hint">scroll</div>
+</section>
+
+<!-- QUIZ -->
+<section class="quiz-section" id="quiz">
+  <p class="section-label">The quiz</p>
+  <h2 class="section-title">Tell us about yourself</h2>
+
+  <div class="progress-wrap">
+    <div class="progress-dots" id="dots"></div>
+    <p class="progress-text" id="prog-text">Question 1 of 8</p>
+  </div>
+
+  <div id="quiz-area"></div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section">
+  <div class="about-inner">
+    <p class="about-eyebrow">Why coffee?</p>
+    <h2 class="about-title">More than a drink —<br>it's a <em>ritual</em></h2>
+    <p class="about-text">Coffee is the most personal brew in the world. The way you drink it tells a story — about your pace, your mood, your taste. Whether you're an espresso purist or a cold-brew wanderer, every sip is a reflection of who you are.</p>
+    <div class="facts-row">
+      <div class="fact"><span class="fact-num">2.5B</span><span class="fact-label">cups per day</span></div>
+      <div class="fact"><span class="fact-num">70+</span><span class="fact-label">countries grow it</span></div>
+      <div class="fact"><span class="fact-num">1000+</span><span class="fact-label">flavor compounds</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  Made with love &amp; <span>☕</span> by Brew &amp; You
+</footer>
+
+<script>
+const questions = [
+  {
+    id: "coffee",
+    text: "What's your favourite coffee?",
+    icon: "☕",
+    options: [
+      { label: "Espresso", icon: "⚡" },
+      { label: "Cappuccino", icon: "☁️" },
+      { label: "Latte", icon: "🥛" },
+      { label: "Americano", icon: "💧" },
+      { label: "Cold brew", icon: "🧊" },
+      { label: "I don't drink coffee", icon: "🫖" },
+    ]
+  },
+  {
+    id: "roast",
+    text: "What roast level speaks to you?",
+    options: [
+      { label: "Light — fruity & bright", icon: "🌸" },
+      { label: "Medium — smooth & balanced", icon: "✨" },
+      { label: "Dark — bold & smoky", icon: "🔥" },
+      { label: "No preference", icon: "🤷" },
+    ]
+  },
+  {
+    id: "milk",
+    text: "What do you put in your cup?",
+    options: [
+      { label: "Nothing — black only", icon: "🖤" },
+      { label: "Whole milk", icon: "🐄" },
+      { label: "Plant-based milk", icon: "🌱" },
+      { label: "Cream & sugar", icon: "🍯" },
+      { label: "A lot of sugar", icon: "🍬" },
+    ]
+  },
+  {
+    id: "time",
+    text: "When do you usually drink coffee?",
+    options: [
+      { label: "First thing in the morning", icon: "🌅" },
+      { label: "Mid-morning", icon: "🕙" },
+      { label: "After lunch", icon: "🌞" },
+      { label: "All day long", icon: "🔄" },
+      { label: "Only when I really need it", icon: "😴" },
+    ]
+  },
+  {
+    id: "vibe",
+    text: "What's your favourite coffee setting?",
+    options: [
+      { label: "Cozy café with a book", icon: "📖" },
+      { label: "Home with my own machine", icon: "🏠" },
+      { label: "On-the-go takeaway cup", icon: "🚶" },
+      { label: "Office break room", icon: "💼" },
+      { label: "Wherever I can find it", icon: "🗺️" },
+    ]
+  },
+  {
+    id: "mood",
+    text: "What do you want coffee to do for you?",
+    options: [
+      { label: "Wake me up immediately", icon: "⚡" },
+      { label: "Help me focus deeply", icon: "🧠" },
+      { label: "Give me a social ritual", icon: "🤝" },
+      { label: "Warm & comfort me", icon: "🧣" },
+      { label: "Pure pleasure, no reason needed", icon: "💛" },
+    ]
+  },
+  {
+    id: "sweet",
+    text: "How do you feel about sweet drinks?",
+    options: [
+      { label: "Not at all — simpler is better", icon: "🚫" },
+      { label: "A little sweetness is nice", icon: "🍂" },
+      { label: "I love sweet flavoured drinks", icon: "🍮" },
+      { label: "It depends on my mood", icon: "🌙" },
+    ]
+  },
+  {
+    id: "morning",
+    text: "Describe your morning in one word:",
+    options: [
+      { label: "Rushed", icon: "💨" },
+      { label: "Slow & peaceful", icon: "🌿" },
+      { label: "Chaotic", icon: "🌀" },
+      { label: "Productive", icon: "📋" },
+    ]
+  },
+];
+
+const profiles = [
+  {
+    match: a => a.coffee === "Espresso" || a.roast === "Dark — bold & smoky",
+    emoji: "⚡",
+    name: "The Purist",
+    desc: "Bold, intense, no fuss. You know exactly what you want and you want it strong. Espresso is your love language — short, powerful, and unapologetic.",
+  },
+  {
+    match: a => a.coffee === "Cold brew" || a.time === "All day long",
+    emoji: "🧊",
+    name: "The Chill Enthusiast",
+    desc: "Smooth, cool, effortlessly caffeinated. Cold brew or iced latte — your coffee is as laid-back and unhurried as your whole vibe.",
+  },
+  {
+    match: a => a.coffee === "Latte" || a.coffee === "Cappuccino" || a.milk === "Whole milk",
+    emoji: "☁️",
+    name: "The Milk Lover",
+    desc: "Creamy, silky, perfectly balanced. You believe espresso and milk were made for each other, and honestly? You're right.",
+  },
+  {
+    match: a => a.vibe === "Cozy café with a book" || a.mood === "Warm & comfort me",
+    emoji: "🍂",
+    name: "The Ritual Keeper",
+    desc: "Coffee is ceremony for you. The warm cup, the quiet moment, the unhurried sip — you don't just drink coffee, you experience it.",
+  },
+  {
+    match: a => a.coffee === "I don't drink coffee" || a.roast === "No preference",
+    emoji: "🫖",
+    name: "The Tea-Curious",
+    desc: "Coffee might not be your main squeeze — and that's perfectly okay. You appreciate a good warm drink without the caffeine dependency.",
+  },
+  {
+    match: () => true,
+    emoji: "✨",
+    name: "The Explorer",
+    desc: "You have no single allegiance — today espresso, tomorrow cold brew, maybe a latte on Sunday. Variety is your spice, curiosity your compass.",
+  },
+];
+
+let current = 0;
+const answers = {};
+
+function getProfile() {
+  return profiles.find(p => p.match(answers)) || profiles[profiles.length - 1];
+}
+
+function renderDots() {
+  const container = document.getElementById('dots');
+  container.innerHTML = questions.map((_, i) => {
+    const cls = i < current ? 'done' : i === current ? 'active' : '';
+    return `<div class="dot ${cls}"></div>`;
+  }).join('');
+  document.getElementById('prog-text').textContent =
+    current >= questions.length ? 'Quiz complete!' : `Question ${current + 1} of ${questions.length}`;
+}
+
+function renderQuestion() {
+  renderDots();
+  const area = document.getElementById('quiz-area');
+  if (current >= questions.length) {
+    renderResult(area);
+    return;
+  }
+  const q = questions[current];
+  area.innerHTML = `
+    <div class="q-card">
+      <p class="q-number">Q${current + 1}</p>
+      <p class="q-text">${q.text}</p>
+      <div class="options">
+        ${q.options.map(opt => `
+          <button class="opt ${answers[q.id] === opt.label ? 'selected' : ''}"
+            onclick="selectAnswer('${q.id}','${opt.label.replace(/'/g,"&#39;")}')">
+            <span class="opt-icon">${opt.icon}</span>
+            ${opt.label}
+          </button>
+        `).join('')}
+      </div>
+      <div class="nav">
+        <button class="nav-back" onclick="go(-1)" ${current === 0 ? 'disabled' : ''}>← Back</button>
+        <button class="nav-next" onclick="go(1)" ${!answers[q.id] ? 'disabled' : ''}>
+          ${current === questions.length - 1 ? 'See my result →' : 'Next →'}
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderResult(area) {
+  const p = getProfile();
+  area.innerHTML = `
+    <div class="result-wrap">
+      <div class="result-header">
+        <div class="result-cup">${p.emoji}</div>
+        <p class="result-type">Your coffee personality</p>
+        <h3 class="result-name">${p.name}</h3>
+        <p class="result-desc">${p.desc}</p>
+      </div>
+      <div class="answers-grid">
+        ${questions.map(q => answers[q.id] ? `
+          <div class="ans-row">
+            <span class="ans-q">${q.text}</span>
+            <span class="ans-a">${answers[q.id]}</span>
+          </div>` : '').join('')}
+      </div>
+      <div class="result-btns">
+        <button class="btn-retake" onclick="restart()">Take it again</button>
+        <button class="btn-share" onclick="shareResult('${p.name}')">Share result</button>
+      </div>
+    </div>`;
+}
+
+function selectAnswer(id, val) {
+  answers[id] = val;
+  renderQuestion();
+}
+
+function go(dir) {
+  const next = current + dir;
+  if (next < 0 || next > questions.length) return;
+  current = next;
+  renderQuestion();
+  document.getElementById('quiz').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function restart() {
+  current = 0;
+  Object.keys(answers).forEach(k => delete answers[k]);
+  renderQuestion();
+  document.getElementById('quiz').scrollIntoView({ behavior: 'smooth' });
+}
+
+function shareResult(name) {
+  const text = `I'm "${name}" according to the Brew & You coffee quiz!`;
+  if (navigator.share) {
+    navigator.share({ title: 'Brew & You', text });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text);
+    alert('Result copied to clipboard!');
+  }
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
